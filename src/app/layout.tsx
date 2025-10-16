@@ -32,7 +32,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export function generateMetadata(): Metadata {
   const title = "AI Emoji Generator"
-  const description = "Turn your ideas into emojis in seconds. Generate your favorite Slack emojis with just one click."
+  const description = "Turn your ideas into emojiis in seconds. Generate your favorite Slack emojis with just one click."
 
   return {
     metadataBase: new URL(PROD_URL),
