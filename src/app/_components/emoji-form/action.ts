@@ -44,9 +44,10 @@ export async function createEmoji(prevFormState: FormState | undefined, formData
     const { ip, isIOS } = jwtSchema.parse(verified.payload)
     console.log("IP:", ip, "isIOS:", isIOS)
 
-    const { remaining } = await (isIOS ? ratelimit.ios.limit(ip) : ratelimit.free.limit(ip))
-    console.log("Rate limit remaining:", remaining)
-    if (remaining <= 0) return { message: "Free limit reached, download mobile app for unlimited access." }
+    // Temporarily disabled due to Upstash free tier limitations
+    // const { remaining } = await (isIOS ? ratelimit.ios.limit(ip) : ratelimit.free.limit(ip))
+    // console.log("Rate limit remaining:", remaining)
+    // if (remaining <= 0) return { message: "Free limit reached, download mobile app for unlimited access." }
 
     console.log("Classifying prompt with Replicate")
     const safetyRating = await replicate.classifyPrompt({ prompt })
