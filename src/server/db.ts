@@ -1,11 +1,10 @@
-import { PrismaClient } from "@prisma/client/edge"
-import { withAccelerate } from "@prisma/extension-accelerate"
+import { PrismaClient } from "@prisma/client"
 import "server-only"
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  }).$extends(withAccelerate())
+  })
 }
 
 type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
