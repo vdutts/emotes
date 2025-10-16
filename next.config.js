@@ -4,9 +4,19 @@ const { withAxiom } = require("next-axiom")
 const nextConfig = withAxiom({
   experimental: {
     serverActions: true,
+    serverComponentsExternalPackages: ["@prisma/client"],
   },
   images: {
-    domains: ["aaah0mnbncqtinas.public.blob.vercel-storage.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "aaah0mnbncqtinas.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
     unoptimized: true,
   },
   rewrites: async () => [
