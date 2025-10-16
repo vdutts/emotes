@@ -2,7 +2,6 @@ import { prisma } from "@/server/db"
 import { EmojiContextProps, Response } from "@/server/utils"
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
 export const fetchCache = "force-no-store"
 export const revalidate = 0
 
