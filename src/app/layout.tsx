@@ -47,7 +47,7 @@ export function generateMetadata(): Metadata {
       title,
       description,
       url: PROD_URL,
-      siteName: "emojis.sh",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "AI Emoji Generator",
       locale: "en_US",
       type: "website",
     },

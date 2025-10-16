@@ -12,12 +12,12 @@ const nextConfig = withAxiom({
   rewrites: async () => [
     {
       source: "/privacy",
-      destination: "https://api.emojis.sh/assets/privacy",
+      destination: `${process.env.NEXT_PUBLIC_API_URL || "https://api.yourdomain.com"}/assets/privacy`,
       basePath: false,
     },
     {
       source: "/terms",
-      destination: "https://api.emojis.sh/assets/terms",
+      destination: `${process.env.NEXT_PUBLIC_API_URL || "https://api.yourdomain.com"}/assets/terms`,
       basePath: false,
     },
   ],
