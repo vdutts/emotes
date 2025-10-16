@@ -1,7 +1,7 @@
 import { Response, webhookSchema } from "@/server/utils"
 import { prisma } from "@/server/db"
 import { replicate } from "@/server/replicate"
-import { put } from "@vercel/blob"
+import { uploadToCloudinary } from "@/lib/cloudinary"
 
 export async function POST(req: Request) {
   try {
@@ -21,11 +21,11 @@ export async function POST(req: Request) {
 
     if (!output) return Response.badRequest("Missing output")
 
-    // convert output to a blob object
-    const file = await fetch(output[0]).then((res) => res.blob())
+    // convert output to a buffer
+    const file = await fetch(output[0]).then((res) => res.arrayBuffer())
 
     // upload & store image
-    const { url } = await put(`${id}-original.png`, file, { access: "public" })
+    const url = await uploadToCloudinary(Buffer.from(file), `${id}-original`)
 
     // update emoji
     await prisma.emoji.update({ where: { id }, data: { originalUrl: url } })

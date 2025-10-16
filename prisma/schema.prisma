@@ -3,13 +3,12 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Emoji {
@@ -25,5 +24,5 @@ model Emoji {
   error           String?
 
   @@index([isFlagged, originalUrl, noBackgroundUrl])
-  @@fulltext([prompt])
+  @@index([prompt])
 }
