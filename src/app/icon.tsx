@@ -1,9 +1,7 @@
-import { FEATURED_OG_IMAGES } from "@/lib/constants"
-import { getRandomItem } from "@/lib/utils"
 import { Favicon } from "./_components/favicon"
 
 export { contentType, size } from "./_components/favicon"
 
 export default async function Icon() {
-  return Favicon({ url: getRandomItem(FEATURED_OG_IMAGES) })
+  return Favicon({ url: "/_static/joker.png" })
 }

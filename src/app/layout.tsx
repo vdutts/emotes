@@ -90,19 +90,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span>emojis</span>
           </Link>
 
-          <div className="flex flex-row flex-nowrap gap-x-1.5 items-center">
-            <Link href="/app?referrer=website" target="_blank" rel="noopener noreferrer">
-              <span className="sr-only">Download App</span>
-              <Image
-                src="/_static/AppStoreBadge.svg"
-                alt="App Store Badge"
-                width={120}
-                height={40}
-                priority
-                className="h-8"
-              />
-            </Link>
-          </div>
         </header>
         <main className={cn("min-h-screen flex items-stretch flex-col pb-28 max-w-5xl mx-auto", BODY_PADDING)}>
           {children}
