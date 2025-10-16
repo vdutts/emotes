@@ -35,7 +35,9 @@ export async function POST(req: Request) {
 
     return Response.success()
   } catch (error) {
-    console.error(error)
+    console.error("Webhook error:", error)
+    console.error("Error details:", error instanceof Error ? error.message : String(error))
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack")
     return Response.internalServerError()
   }
 }
