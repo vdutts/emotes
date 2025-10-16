@@ -9,6 +9,7 @@ export default async function Image({ params }: EmojiContextProps) {
   const data = await getEmoji(params.id)
   if (!data) return
 
-  const image = data.noBackgroundUrl || data.originalUrl || DEFAULT_OG_IMAGE
+  const image = data.noBackgroundUrl || data.originalUrl
+  if (!image) return
   return OpenGraphImage({ url: image })
 }
