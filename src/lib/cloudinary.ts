@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary"
-import { put } from "@vercel/blob"
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "ddyc1es5v",
@@ -8,28 +8,25 @@ cloudinary.config({
 })
 
 export async function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
-  // Try Cloudinary first, fallback to Vercel Blob if it fails
   try {
-    console.log("Cloudinary config check:", {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? "SET" : "MISSING",
-      api_key: process.env.CLOUDINARY_API_KEY ? "SET" : "MISSING",
-      api_secret: process.env.CLOUDINARY_API_SECRET ? "SET" : "MISSING",
-    })
+    console.log("Starting Cloudinary upload for:", filename)
     
-    if (!process.env.CLOUDINARY_CLOUD_NAME) {
-      throw new Error("Cloudinary not configured, using Vercel Blob")
-    }
-
     return await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: "emojis",
           public_id: filename,
           resource_type: "image",
+          format: "png",
         },
         (error, result) => {
-          if (error) reject(error)
-          else resolve(result!.secure_url)
+          if (error) {
+            console.error("Cloudinary upload error:", error)
+            reject(error)
+          } else {
+            console.log("Cloudinary upload success:", result!.secure_url)
+            resolve(result!.secure_url)
+          }
         }
       )
       uploadStream.end(buffer)
