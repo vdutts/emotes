@@ -31,12 +31,13 @@ export async function uploadToCloudinary(buffer: Buffer, filename: string): Prom
   } catch (cloudinaryError) {
     console.warn("Cloudinary upload failed, falling back to Vercel Blob:", cloudinaryError)
     
-    // Fallback to Vercel Blob
-    const blob = await put(`emojis/${filename}.png`, buffer, {
+    // Fallback to Vercel Blob - convert Buffer to Blob
+    const imageBlob = new Blob([buffer], { type: "image/png" })
+    const blobResult = await put(`emojis/${filename}.png`, imageBlob, {
       access: "public",
       contentType: "image/png",
     })
     
-    return blob.url
+    return blobResult.url
   }
 }
