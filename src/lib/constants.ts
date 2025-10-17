@@ -1,4 +1,4 @@
-export const PROD_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://emotesy.vercel.app"
+export const PROD_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://emotika.vercel.app"
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"

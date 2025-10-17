@@ -57,7 +57,7 @@ export class ReplicateClient {
         input: {
           prompt,
           max_new_tokens: 128,
-          temperature: 0.2,
+          temperature: 0.6,
           top_p: 0.9,
           top_k: 50,
           stop_sequences: "[/SAFETY_RANKING]",
