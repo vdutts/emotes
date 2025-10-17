@@ -10,6 +10,12 @@ cloudinary.config({
 export async function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
   // Try Cloudinary first, fallback to Vercel Blob if it fails
   try {
+    console.log("Cloudinary config check:", {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? "SET" : "MISSING",
+      api_key: process.env.CLOUDINARY_API_KEY ? "SET" : "MISSING",
+      api_secret: process.env.CLOUDINARY_API_SECRET ? "SET" : "MISSING",
+    })
+    
     if (!process.env.CLOUDINARY_CLOUD_NAME) {
       throw new Error("Cloudinary not configured, using Vercel Blob")
     }
