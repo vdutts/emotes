@@ -1,36 +1,31 @@
 import { v2 as cloudinary } from "cloudinary"
 
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "ddyc1es5v",
-  api_key: process.env.CLOUDINARY_API_KEY || "458158127669987",
-  api_secret: process.env.CLOUDINARY_API_SECRET || "a6-YrbGmp_QdGPv3PWqZZWxiWB4",
-})
+// Use CLOUDINARY_URL format if available, otherwise individual config
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config(process.env.CLOUDINARY_URL)
+} else {
+  cloudinary.config({
+    cloud_name: "ddyc1es5v",
+    api_key: "458158127669987",
+    api_secret: "a6-YrbGmp_QdGPv3PWqZZWxiWB4",
+  })
+}
 
 export async function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
   try {
     console.log("Starting Cloudinary upload for:", filename)
     
-    return await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: "emojis",
-          public_id: filename,
-          resource_type: "image",
-          format: "png",
-        },
-        (error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error:", error)
-            reject(error)
-          } else {
-            console.log("Cloudinary upload success:", result!.secure_url)
-            resolve(result!.secure_url)
-          }
-        }
-      )
-      uploadStream.end(buffer)
+    // Convert buffer to base64 data URI
+    const base64 = `data:image/png;base64,${buffer.toString('base64')}`
+    
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: "emojis",
+      public_id: filename,
+      resource_type: "image",
     })
+    
+    console.log("Cloudinary upload success:", result.secure_url)
+    return result.secure_url
   } catch (cloudinaryError) {
     console.error("Cloudinary upload failed:", cloudinaryError)
     throw cloudinaryError
