@@ -49,15 +49,7 @@ export async function createEmoji(prevFormState: FormState | undefined, formData
     // console.log("Rate limit remaining:", remaining)
     // if (remaining <= 0) return { message: "Free limit reached, download mobile app for unlimited access." }
 
-    console.log("Classifying prompt with Replicate")
-    const safetyRating = await replicate.classifyPrompt({ prompt })
-    console.log("Safety rating:", safetyRating)
-    const data = { id, prompt, safetyRating }
-
-    if (safetyRating >= 9) {
-      await prisma.emoji.create({ data: { ...data, isFlagged: true } })
-      return { message: "Nice try! Your prompt is inappropriate, let's keep it PG." }
-    }
+    const data = { id, prompt, safetyRating: 0 }
 
     console.log("Creating emoji in DB and starting generation")
     await Promise.all([prisma.emoji.create({ data }), replicate.createEmoji(data)])

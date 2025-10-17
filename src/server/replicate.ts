@@ -1,75 +1,79 @@
-import Replicate from "replicate"
+import Together from "together-ai"
 import "server-only"
 import { EMOJI_SIZE, SITE_URL } from "../lib/constants"
 
 export class ReplicateClient {
-  replicate: Replicate
+  together: Together
 
   constructor({ auth }: { auth: string }) {
-    this.replicate = new Replicate({ auth })
-
-    // 🫠 - https://github.com/replicate/replicate-javascript/issues/136
-    this.replicate.fetch = (input: RequestInfo | URL, init?: RequestInit) =>
-      fetch(input, { ...init, cache: "no-store" })
+    this.together = new Together({ apiKey: auth })
   }
 
   async createEmoji({ id, prompt }: { id: string; prompt: string }) {
+    // Generate image with Together.ai (faster, uncensored)
+    const response = await this.together.images.create({
+      model: "stabilityai/stable-diffusion-xl-base-1.0",
+      prompt: `A TOK emoji of a ${prompt}`,
+      width: EMOJI_SIZE,
+      height: EMOJI_SIZE,
+      steps: 30,
+      n: 1,
+    })
+
+    const imageUrl = response.data[0].url
+    
+    // Manually trigger webhook since Together.ai doesn't support webhooks
     const webhook = new URL(`${SITE_URL}/api/webhook/remove-background`)
     webhook.searchParams.set("id", id)
     webhook.searchParams.set("secret", process.env.API_SECRET as string)
 
-    return this.replicate.predictions.create({
-      version: "dee76b5afde21b0f01ed7925f0665b7e879c50ee718c5f78a9d38e04d523cc5e",
-      input: {
-        prompt: `A TOK emoji of a ${prompt}`,
-        width: EMOJI_SIZE,
-        height: EMOJI_SIZE,
-        num_inference_steps: 30,
-        // prompt_strength: 0.8,
-        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted",
-      },
-      webhook: webhook.toString(),
-      webhook_events_filter: ["completed"],
+    // Call webhook with the generated image
+    await fetch(webhook.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        output: [imageUrl],
+        status: "succeeded",
+      }),
     })
+
+    return { id, url: imageUrl }
   }
 
   async removeBackground({ id, image }: { id: string; image: string }) {
+    // Use remove.bg API (faster than Replicate)
+    const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+      method: "POST",
+      headers: {
+        "X-Api-Key": process.env.REMOVE_BG_API_KEY || "",
+      },
+      body: JSON.stringify({
+        image_url: image,
+        size: "auto",
+      }),
+    })
+
+    const blob = await response.blob()
+    const buffer = Buffer.from(await blob.arrayBuffer())
+
+    // Manually trigger save webhook
     const webhook = new URL(`${SITE_URL}/api/webhook/save-emoji`)
     webhook.searchParams.set("id", id)
     webhook.searchParams.set("secret", process.env.API_SECRET as string)
 
-    return this.replicate.predictions.create({
-      version: "fb8af171cfa1616ddcf1242c093f9c46bcada5ad4cf6f2fbe8b81b330ec5c003",
-      input: {
-        image,
-      },
-      webhook: webhook.toString(),
-      webhook_events_filter: ["completed"],
+    await fetch(webhook.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        output: buffer.toString("base64"),
+        status: "succeeded",
+      }),
     })
-  }
 
-  async classifyPrompt({ prompt: _prompt }: { prompt: string }): Promise<number> {
-    const prompt = `[PROMPT] ${_prompt} [/PROMPT] [SAFETY_RANKING]`
-
-    const output = await this.replicate.run(
-      "fofr/prompt-classifier:1ffac777bf2c1f5a4a5073faf389fefe59a8b9326b3ca329e9d576cce658a00f",
-      {
-        input: {
-          prompt,
-          max_new_tokens: 128,
-          temperature: 0.6,
-          top_p: 0.9,
-          top_k: 50,
-          stop_sequences: "[/SAFETY_RANKING]",
-        },
-      }
-    )
-
-    const safetyRating = Number((output as string[] | undefined)?.join("").trim())
-    return safetyRating || 0
+    return { id }
   }
 }
 
 export const replicate = new ReplicateClient({
-  auth: process.env.REPLICATE_API_TOKEN as string,
+  auth: process.env.TOGETHER_API_KEY as string,
 })

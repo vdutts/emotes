@@ -6,9 +6,9 @@ export async function middleware(request: NextRequest) {
   
   // Bypass Vercel deployment protection for webhook routes
   // This allows Replicate to send webhooks without authentication
-  if (request.nextUrl.pathname.startsWith("/api/webhook/")) {
-    response.headers.set("x-vercel-protection-bypass", "1")
-  }
+  // if (request.nextUrl.pathname.startsWith("/api/webhook/")) {
+  //   response.headers.set("x-vercel-protection-bypass", "1")
+  // }
   
   return response
 }
