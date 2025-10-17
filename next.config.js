@@ -1,7 +1,5 @@
-const { withAxiom } = require("next-axiom")
-
 /** @type {import('next').NextConfig} */
-const nextConfig = withAxiom({
+const nextConfig = {
   experimental: {
     serverActions: true,
     serverComponentsExternalPackages: ["@prisma/client"],
@@ -31,6 +29,6 @@ const nextConfig = withAxiom({
       basePath: false,
     },
   ],
-})
+}
 
 module.exports = nextConfig
