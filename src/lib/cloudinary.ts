@@ -2,9 +2,9 @@ import { v2 as cloudinary } from "cloudinary"
 import { put } from "@vercel/blob"
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "ddyc1es5v",
+  api_key: process.env.CLOUDINARY_API_KEY || "458158127669987",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "a6-YrbGmp_QdGPv3PWqZZWxiWB4",
 })
 
 export async function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
@@ -35,15 +35,7 @@ export async function uploadToCloudinary(buffer: Buffer, filename: string): Prom
       uploadStream.end(buffer)
     })
   } catch (cloudinaryError) {
-    console.warn("Cloudinary upload failed, falling back to Vercel Blob:", cloudinaryError)
-    
-    // Fallback to Vercel Blob - convert Buffer to Blob
-    const imageBlob = new Blob([buffer], { type: "image/png" })
-    const blobResult = await put(`emojis/${filename}.png`, imageBlob, {
-      access: "public",
-      contentType: "image/png",
-    })
-    
-    return blobResult.url
+    console.error("Cloudinary upload failed:", cloudinaryError)
+    throw cloudinaryError
   }
 }
